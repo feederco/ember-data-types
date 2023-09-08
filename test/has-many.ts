@@ -1,9 +1,10 @@
 import Ember from 'ember';
-import DS from 'ember-data';
 import { assertType } from './lib/assert';
+import Model, { attr, hasMany } from 'ember-data/model';
+import { Collection } from 'ember-data/store/record-arrays';
 
-class BlogComment extends DS.Model {
-    text = DS.attr('string');
+class BlogComment extends Model {
+    text = attr('string');
 }
 
 declare module 'ember-data/types/registries/model' {
@@ -12,15 +13,15 @@ declare module 'ember-data/types/registries/model' {
     }
 }
 
-class BlogPost extends DS.Model {
-    title = DS.attr('string');
-    commentsAsync = DS.hasMany('blog-comment');
-    commentsSync = DS.hasMany('blog-comment', { async: false });
+class BlogPost extends Model {
+    title = attr('string');
+    commentsAsync = hasMany('blog-comment');
+    commentsSync = hasMany('blog-comment', { async: false });
 }
 
 const blogPost = BlogPost.create();
 
-assertType<DS.PromiseArray<BlogComment>>(blogPost.get('commentsSync').reload());
+assertType<Promise<BlogComment[]>>(blogPost.get('commentsSync').reload());
 assertType<BlogComment>(blogPost.get('commentsSync').createRecord());
 
 const comment = blogPost.get('commentsSync').get('firstObject');
@@ -29,7 +30,7 @@ if (comment) {
     assertType<string>(comment.get('text'));
 }
 
-assertType<DS.PromiseArray<BlogComment>>(blogPost.get('commentsAsync').reload());
+assertType<Promise<Collection<<BlogComment>>(blogPost.get('commentsAsync').reload());
 assertType<BlogComment>(blogPost.get('commentsAsync').createRecord());
 assertType<BlogComment | undefined>(blogPost.get('commentsAsync').get('firstObject'));
 
@@ -49,15 +50,15 @@ blogPost.set('commentsAsync', blogPost.get('commentsAsync'));
 blogPost.set('commentsAsync', Ember.A());
 blogPost.set('commentsAsync', Ember.A([comment!]));
 
-class PaymentMethod extends DS.Model {}
+class PaymentMethod extends Model {}
 declare module 'ember-data/types/registries/model' {
     export default interface ModelRegistry {
         'payment-method': PaymentMethod;
     }
 }
 
-class Polymorphic extends DS.Model {
-    paymentMethods = DS.hasMany('payment-method', { polymorphic: true });
+class Polymorphic extends Model {
+    paymentMethods = hasMany('payment-method', { polymorphic: true });
 }
 
 // $ExpectType ManyArray<any> | null

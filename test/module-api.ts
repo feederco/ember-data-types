@@ -21,11 +21,11 @@ import attr from 'ember-data/attr';
 import { hasMany, belongsTo } from 'ember-data/relationships';
 
 // Transforms
-import BooleanTransform from 'ember-data/transforms/boolean';
-import StringTransform from 'ember-data/transforms/string';
-import NumberTransform from 'ember-data/transforms/number';
-import DateTransform from 'ember-data/transforms/date';
-import Transform from 'ember-data/transforms/transform';
+import BooleanTransform from 'ember-data/transform/boolean';
+import StringTransform from 'ember-data/transform/string';
+import NumberTransform from 'ember-data/transform/number';
+import DateTransform from 'ember-data/transform/date';
+import Transform from 'ember-data/transform/transform';
 
 // Store
 import Store from 'ember-data/store';
@@ -87,5 +87,3 @@ assertType<typeof DS.ConflictError>(EDErrors.ConflictError);
 assertType<typeof DS.ServerError>(EDErrors.ServerError);
 assertType<typeof DS.TimeoutError>(EDErrors.TimeoutError);
 assertType<typeof DS.AbortError>(EDErrors.AbortError);
-assertType<typeof DS.errorsHashToArray>(EDErrors.errorsHashToArray);
-assertType<typeof DS.errorsArrayToHash>(EDErrors.errorsArrayToHash);

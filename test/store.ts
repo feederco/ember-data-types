@@ -1,15 +1,16 @@
 import { service } from '@ember/service';
 import Ember from 'ember';
-import DS from 'ember-data';
 import { assertType } from './lib/assert';
 import { Comment } from './relationships';
+import Store from 'ember-data/store';
+import Model, { attr, hasMany, belongsTo } from '@ember-data/model';
 
-declare const store: DS.Store;
+declare const store: Store;
 
-class PostComment extends DS.Model {}
-class Post extends DS.Model {
-    title = DS.attr('string');
-    comments = DS.hasMany('comment');
+class PostComment extends Model {}
+class Post extends Model {
+    title = attr('string');
+    comments = hasMany('comment');
 }
 
 declare module 'ember-data/types/registries/model' {
@@ -36,8 +37,8 @@ store.findRecord('post', 1).then(function (post) {
     post.save(); // => PATCH to '/posts/1'
 });
 
-class User extends DS.Model {
-    username = DS.attr('string');
+class User extends Model {
+    username = attr('string');
 }
 
 class Author extends User {}
@@ -73,10 +74,10 @@ if (store.hasRecordForId('post', 1)) {
 }
 
 let posts = store.findAll('post'); // => GET /posts
-assertType<DS.PromiseArray<Post, Ember.ArrayProxy<Post>>>(posts);
+assertType<PromiseArray<Post, Ember.ArrayProxy<Post>>>(posts);
 
-class Message extends DS.Model {
-    hasBeenSeen = DS.attr('boolean');
+class Message extends Model {
+    hasBeenSeen = attr('boolean');
 }
 
 declare module 'ember-data/types/registries/model' {
@@ -108,24 +109,24 @@ const MyRoute = Ember.Route.extend({
     },
 });
 
-// Store is injectable via `inject` and resolves to `DS.Store`.
+// Store is injectable via `inject` and resolves to `Store`.
 const SomeComponent = Ember.Object.extend({
     store: Ember.inject.service('store'),
 
     lookUpUsers() {
-        assertType<DS.PromiseObject<User>>(this.get('store').findRecord('user', 123));
-        assertType<DS.PromiseArray<User>>(this.get('store').findAll('user'));
+        assertType<Promise<User>>(this.get('store').findRecord('user', 123));
+        assertType<Promise<Collection<User>>>(this.get('store').findAll('user'));
     },
 });
 
 const MyRouteAsync = Ember.Route.extend({
     store: service('store'),
 
-    async beforeModel(): Promise<Ember.Array<DS.Model>> {
+    async beforeModel(): Promise<Ember.Array<Model>> {
         const store = Ember.get(this, 'store');
         return await store.findAll('post-comment');
     },
-    async model(): Promise<DS.Model> {
+    async model(): Promise<Model> {
         const store = this.get('store');
         return await store.findRecord('post-comment', 1);
     },
@@ -136,12 +137,12 @@ const MyRouteAsync = Ember.Route.extend({
 });
 
 class MyRouteAsyncES6 extends Ember.Route {
-    @service declare store: DS.Store;
+    @service declare store: Store;
 
-    async beforeModel(): Promise<Ember.Array<DS.Model>> {
+    async beforeModel(): Promise<Ember.Array<Model>> {
         return await this.store.findAll('post-comment');
     }
-    async model(): Promise<DS.Model> {
+    async model(): Promise<Model> {
         return await this.store.findRecord('post-comment', 1);
     }
     async afterModel(): Promise<Ember.Array<Comment>> {
@@ -163,7 +164,7 @@ const tom = store
 
 // GET /users?isAdmin=true
 const adminsQuery = store.query('user', { isAdmin: true });
-assertType<DS.PromiseArray<User, DS.AdapterPopulatedRecordArray<User>>>(adminsQuery);
+assertType<PromiseArray<User, AdapterPopulatedRecordArray<User>>>(adminsQuery);
 
 adminsQuery.then(function (admins) {
     console.log(admins.get("length")); // 42
@@ -205,10 +206,10 @@ store.push({
     ],
 });
 
-class UserAdapter extends DS.Adapter {
+class UserAdapter extends Adapter {
     thisAdapterOnlyMethod(): void {}
 }
-class UserSerializer extends DS.Serializer {
+class UserSerializer extends Serializer {
     thisSerializerOnlyMethod(): void {}
 }
 

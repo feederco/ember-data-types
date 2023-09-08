@@ -1,52 +1,52 @@
 import Ember from 'ember';
-import DS, { ChangedAttributes } from 'ember-data';
 import { assertType } from './lib/assert';
-import RSVP from 'rsvp';
 import { Point } from './transform';
+import Model, { attr, ChangedAttributes } from 'ember-data/model';
+import Store from 'ember-data/store';
 
 enum MyEnum {
     hello,
     there,
 }
 
-class Hello extends DS.Model {
-    @DS.attr('enum', { allowedValues: MyEnum }) declare myEnum: MyEnum;
+class Hello extends Model {
+    @attr('enum', { allowedValues: MyEnum }) declare myEnum: MyEnum;
 }
 
 const hello = Hello.create();
 assertType<MyEnum>(hello.get('myEnum'));
 
-const Person = DS.Model.extend({
-    firstName: DS.attr(),
-    lastName: DS.attr(),
-    title: DS.attr({ defaultValue: 'The default' }),
-    title2: DS.attr({ defaultValue: () => 'The default' }),
+const Person = Model.extend({
+    firstName: attr(),
+    lastName: attr(),
+    title: attr({ defaultValue: 'The default' }),
+    title2: attr({ defaultValue: () => 'The default' }),
 
     fullName: Ember.computed('firstName', 'lastName', function () {
         return `${this.get('firstName')} ${this.get('lastName')}`;
     }),
 
-    point: DS.attr('point', { defaultValue: () => Point.create({ x: 1, y: 2 })}),
-    oldPoint: DS.attr('oldPoint', { defaultValue: () => Point.create({ x: 1, y: 2 })}),
+    point: attr('point', { defaultValue: () => Point.create({ x: 1, y: 2 })}),
+    oldPoint: attr('oldPoint', { defaultValue: () => Point.create({ x: 1, y: 2 })}),
 
     // Can't have a non-primitive as default
     // @ts-expect-error
-    anotherPoint: DS.attr('point', { defaultValue: Point.create({ x: 1, y: 2 })})
+    anotherPoint: attr('point', { defaultValue: Point.create({ x: 1, y: 2 })})
 });
 
 const person = Person.create();
 assertType<Point>(person.get('point'));
 assertType<Point>(person.get('oldPoint'));
 
-assertType<DS.Errors>(person.get('errors'));
-assertType<DS.Errors>(person.errors);
+assertType<Errors>(person.get('errors'));
+assertType<Errors>(person.errors);
 
-const User = DS.Model.extend({
-    username: DS.attr('string'),
-    email: DS.attr('string'),
-    verified: DS.attr('boolean', { defaultValue: false }),
-    canBeNull: DS.attr('boolean', { allowNull: true }),
-    createdAt: DS.attr('date', {
+const User = Model.extend({
+    username: attr('string'),
+    email: attr('string'),
+    verified: attr('boolean', { defaultValue: false }),
+    canBeNull: attr('boolean', { allowNull: true }),
+    createdAt: attr('date', {
         defaultValue() {
             return new Date();
         },
@@ -58,7 +58,7 @@ assertType<string>(user.get('id'));
 assertType<string>(user.get('username'));
 assertType<boolean>(user.get('verified'));
 assertType<Date>(user.get('createdAt'));
-assertType<DS.Store>(user.get('store'));
+assertType<Store>(user.get('store'));
 
 user.serialize();
 user.serialize({ includeId: true });
@@ -68,7 +68,7 @@ const attributes: ChangedAttributes = user.changedAttributes();
 
 user.rollbackAttributes(); // $ExpectType void
 
-let destroyResult: RSVP.Promise<typeof user>;
+let destroyResult: Promise<typeof user>;
 destroyResult = user.destroyRecord();
 destroyResult = user.destroyRecord({});
 destroyResult = user.destroyRecord({ adapterOptions: {} });
@@ -82,7 +82,7 @@ let jsonified: object;
 jsonified = user.toJSON();
 jsonified = user.toJSON({ includeId: true });
 
-let reloaded: RSVP.Promise<typeof user>;
+let reloaded: Promise<typeof user>;
 reloaded = user.reload();
 reloaded = user.reload({});
 reloaded = user.reload({ adapterOptions: {} });

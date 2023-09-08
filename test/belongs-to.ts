@@ -1,12 +1,12 @@
-import DS from 'ember-data';
 import { assertType } from './lib/assert';
+import Model, { attr, belongsTo, hasMany } from 'ember-data/model';
 
-declare const store: DS.Store;
+declare const store: Store;
 
-class Folder extends DS.Model {
-    name = DS.attr('string');
-    children = DS.hasMany('folder', { inverse: 'parent' });
-    parent = DS.belongsTo('folder', { inverse: 'children' });
+class Folder extends Model {
+    name = attr('string');
+    children = hasMany('folder', { inverse: 'parent' });
+    parent = belongsTo('folder', { inverse: 'children' });
 }
 
 declare module 'ember-data/types/registries/model' {
@@ -16,7 +16,7 @@ declare module 'ember-data/types/registries/model' {
 }
 
 const folder = Folder.create();
-assertType<DS.AsyncBelongsTo<Folder | null>>(folder.get('parent'));
+assertType<AsyncBelongsTo<Folder | null>>(folder.get('parent'));
 assertType<string | undefined>(folder.get('parent').get('name'));
 folder.get('parent').set('name', 'New');
 folder.get('parent').then(parent => {

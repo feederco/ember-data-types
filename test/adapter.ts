@@ -1,5 +1,5 @@
 import Ember from 'ember';
-import DS, { ModelSchema } from 'ember-data';
+import { ModelSchema } from 'ember-data';
 
 class Session extends Ember.Service {}
 declare module '@ember/service' {
@@ -8,11 +8,11 @@ declare module '@ember/service' {
     }
 }
 
-const JsonApi = DS.JSONAPIAdapter.extend({
+const JsonApi = JSONAPIAdapter.extend({
     // Application specific overrides go here
 });
 
-const Customized = DS.JSONAPIAdapter.extend({
+const Customized = JSONAPIAdapter.extend({
     host: 'https://api.example.com',
     namespace: 'api/v1',
     headers: {
@@ -21,7 +21,7 @@ const Customized = DS.JSONAPIAdapter.extend({
     },
 });
 
-const AuthTokenHeader = DS.JSONAPIAdapter.extend({
+const AuthTokenHeader = JSONAPIAdapter.extend({
     session: Ember.inject.service('session'),
     headers: Ember.computed('session.authToken', function () {
         return {
@@ -32,7 +32,7 @@ const AuthTokenHeader = DS.JSONAPIAdapter.extend({
 });
 
 // Ensure that we are allowed to overwrite properties with a getter
-class GetterTest extends DS.JSONAPIAdapter {
+class GetterTest extends JSONAPIAdapter {
     get coalesceFindRequests() {
         return false;
     }
@@ -49,8 +49,8 @@ class GetterTest extends DS.JSONAPIAdapter {
     }
 }
 
-const UseAjax = DS.JSONAPIAdapter.extend({
-    query(store: DS.Store, type: ModelSchema, query: object) {
+const UseAjax = JSONAPIAdapter.extend({
+    query(store: Store, type: ModelSchema, query: object) {
         const url = 'https://api.example.com/my-api';
         return this.ajax(url, 'POST', {
             param: 'foo',
@@ -58,8 +58,8 @@ const UseAjax = DS.JSONAPIAdapter.extend({
     },
 });
 
-const UseAjaxOptions = DS.JSONAPIAdapter.extend({
-    query(store: DS.Store, type: ModelSchema, query: object) {
+const UseAjaxOptions = JSONAPIAdapter.extend({
+    query(store: Store, type: ModelSchema, query: object) {
         const url = 'https://api.example.com/my-api';
         const options = this.ajaxOptions(url, 'DELETE', {
             foo: 'bar',
@@ -70,8 +70,8 @@ const UseAjaxOptions = DS.JSONAPIAdapter.extend({
     },
 });
 
-const UseAjaxOptionsWithOptionalThirdParams = DS.JSONAPIAdapter.extend({
-    query(store: DS.Store, type: ModelSchema, query: object) {
+const UseAjaxOptionsWithOptionalThirdParams = JSONAPIAdapter.extend({
+    query(store: Store, type: ModelSchema, query: object) {
         const url = 'https://api.example.com/my-api';
         const options = this.ajaxOptions(url, 'DELETE');
         return fetch(url, {
@@ -88,7 +88,7 @@ declare module 'ember-data/types/registries/model' {
 }
 
 // https://github.com/emberjs/data/blob/c9d8212c857ca78218ad98d11621819b38dba98f/tests/unit/adapters/build-url-mixin/build-url-test.js
-const BuildURLAdapter = DS.RESTAdapter.extend({
+const BuildURLAdapter = RESTAdapter.extend({
     worksWithOnlyModelNameAndId() {
         this.buildURL('rootModel', 1);
     },
