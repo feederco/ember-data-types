@@ -1,12 +1,19 @@
+import Store from 'ember-data/store';
+import { Collection } from 'ember-data/store/record-arrays';
 import { assertType } from './lib/assert';
-import Model, { attr, belongsTo, hasMany } from 'ember-data/model';
+import Model, { AsyncBelongsTo, attr, belongsTo, hasMany } from 'ember-data/model';
 
 declare const store: Store;
 
 class Folder extends Model {
-    name = attr('string');
-    children = hasMany('folder', { inverse: 'parent' });
-    parent = belongsTo('folder', { inverse: 'children' });
+    @attr('string')
+    name!: string;
+
+    @hasMany('folder', { inverse: 'parent', async: false })
+    children!: Collection<Folder>;
+
+    @belongsTo('folder', { inverse: 'children', async: false })
+    parent!: Folder | null;
 }
 
 declare module 'ember-data/types/registries/model' {

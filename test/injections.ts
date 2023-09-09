@@ -1,9 +1,10 @@
-import DS from 'ember-data';
 import { service } from '@ember/service';
 import Store from 'ember-data/store';
 import Route from '@ember/routing/route';
+import Model from 'ember-data/model';
+import { Collection } from 'ember-data/store/record-arrays';
 
-class MyModel extends DS.Model {}
+class MyModel extends Model {}
 
 declare module 'ember-data/types/registries/model' {
     export default interface ModelRegistry {
@@ -14,7 +15,7 @@ declare module 'ember-data/types/registries/model' {
 class RouteTest extends Route {
     @service declare store: Store;
 
-    model(): any {
+    model(): Promise<Collection<MyModel>> {
         return this.store.findAll('my-model');
     }
 }

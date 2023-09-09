@@ -4,6 +4,9 @@ import { assertType } from './lib/assert';
 import { Comment } from './relationships';
 import Store from 'ember-data/store';
 import Model, { attr, hasMany, belongsTo } from '@ember-data/model';
+import Adapter from 'ember-data/adapter';
+import Serializer from 'ember-data/serializer';
+import { Collection } from 'ember-data/store/record-arrays';
 
 declare const store: Store;
 

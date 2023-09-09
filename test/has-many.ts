@@ -15,8 +15,8 @@ declare module 'ember-data/types/registries/model' {
 
 class BlogPost extends Model {
     title = attr('string');
-    commentsAsync = hasMany('blog-comment');
-    commentsSync = hasMany('blog-comment', { async: false });
+    commentsAsync = hasMany('blog-comment', { inverse: null, async: true });
+    commentsSync = hasMany('blog-comment', { inverse: null, async: false });
 }
 
 const blogPost = BlogPost.create();
@@ -30,7 +30,7 @@ if (comment) {
     assertType<string>(comment.get('text'));
 }
 
-assertType<Promise<Collection<<BlogComment>>(blogPost.get('commentsAsync').reload());
+assertType<Promise<Collection<BlogComment>>>(blogPost.get('commentsAsync').reload());
 assertType<BlogComment>(blogPost.get('commentsAsync').createRecord());
 assertType<BlogComment | undefined>(blogPost.get('commentsAsync').get('firstObject'));
 
@@ -58,7 +58,7 @@ declare module 'ember-data/types/registries/model' {
 }
 
 class Polymorphic extends Model {
-    paymentMethods = hasMany('payment-method', { polymorphic: true });
+    paymentMethods = hasMany('payment-method', { async: false, inverse: null, polymorphic: true });
 }
 
 // $ExpectType ManyArray<any> | null

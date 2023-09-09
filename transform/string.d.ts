@@ -1,2 +1,3 @@
-import DS from 'ember-data';
-export default DS.StringTransform;
+import Transform from ".";
+
+export default class StringTransform extends Transform {}

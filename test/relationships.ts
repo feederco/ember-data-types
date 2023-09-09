@@ -1,14 +1,27 @@
-import Ember from 'ember';
-import DS from 'ember-data';
 import TransformRegistry from 'ember-data/types/registries/transform';
 import { assertType } from './lib/assert';
+import Model, { hasMany, belongsTo, attr } from 'ember-data/model';
+import Store from 'ember-data/store';
 
-declare const store: DS.Store;
+declare const store: Store;
 
-const Person = DS.Model.extend({
-    children: DS.hasMany('folder', { inverse: 'parent' }),
-    parent: DS.belongsTo('folder', { inverse: 'children' }),
-});
+class Folder extends Model {}
+
+class PaymentMethod extends Model {}
+
+declare module 'ember-data/types/registries/model' {
+    export default interface ModelRegistry {
+        folder: Folder;
+        'payment-method': PaymentMethod;
+    }
+}
+class Person extends Model {
+    @hasMany('folder', { inverse: 'parent' })
+    children!: Folder;
+
+    @belongsTo('folder', { inverse: 'children' })
+    parent!: Folder;
+}
 
 // $ExpectType void
 Person.eachAttribute(() => {});
@@ -21,7 +34,7 @@ Person.eachAttribute((name, meta) => {
         type: keyof TransformRegistry;
         options: object;
         name: 'children' | 'parent';
-        parentType: DS.Model;
+        parentType: Model;
         isAttribute: true;
     }>(meta);
 });
@@ -36,10 +49,13 @@ Person.eachTransformedAttribute((name, type) => {
     assertType<keyof TransformRegistry>(type);
 });
 
-const Polymorphic = DS.Model.extend({
-    status: DS.attr('string'),
-    paymentMethods: DS.hasMany('payment-method', { polymorphic: true }),
-});
+class Polymorphic extends Model {
+    @attr('string')
+    status!: string;
+
+    @hasMany('payment-method', { polymorphic: true })
+    paymentMethods: PaymentMethod[];
+}
 
 // $ExpectType void
 Polymorphic.eachRelationship(() => '');
@@ -71,20 +87,30 @@ Polymorphic.eachRelatedType(name => {
     assertType<string>(name);
 });
 
-export class Comment extends DS.Model {
-    author = DS.attr('string');
+export class Comment extends Model {
+    author = attr('string');
 }
 
-class Series extends DS.Model {
-    title = DS.attr('string');
+class Series extends Model {
+    title = attr('string');
 }
 
-class RelationalPost extends DS.Model {
-    title = DS.attr('string');
-    tag = DS.attr('string');
-    comments = DS.hasMany('comment', { async: true });
-    relatedPosts = DS.hasMany('post');
-    series = DS.belongsTo('series');
+class RelationalPost extends Model {
+    @attr('string')
+    title!: string;
+
+    @attr('string')
+    tag!: string;
+
+    @hasMany('comment', { async: true })
+    comments!: string;
+
+    @hasMany('post')
+    relatedPosts!: string;
+
+    @belongsTo('series')
+    series!: string;
+
 }
 
 declare module 'ember-data/types/registries/model' {

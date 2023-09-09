@@ -6,20 +6,12 @@ import { JSONAPIError } from "./json-api";
  * subclasses are used to indicate specific error states. The following
  * subclasses are provided:
  */
-export class AdapterError {
+export class AdapterError extends Error {
   isAdapterError: boolean;
-
-  stack?: string[];
-  description?: string;
-  fileName?: string;
-  lineNumber?: number;
-  message?: string;
-  name?: string;
-  number?: number;
 
   static code: string;
 
-  constructor(errors: JSONAPIError[], message?: string);
+  constructor(errors?: JSONAPIError[], message?: string);
 }
 /**
 * A `InvalidError` is used by an adapter to signal the external API

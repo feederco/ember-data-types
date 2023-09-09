@@ -12,7 +12,7 @@ export type JSONAPIErrorSource = {
 export type JSONAPIError = {
   title?: string;
   detail: string;
-  source?: JSONAPIErrorSource[];
+  source?: JSONAPIErrorSource[] | JSONAPIErrorSource
 }
 
 /**

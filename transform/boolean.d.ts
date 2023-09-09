@@ -1,2 +1,3 @@
-import DS from 'ember-data';
-export default DS.BooleanTransform;
+import Transform from ".";
+
+export default class BooleanTransform extends Transform {}

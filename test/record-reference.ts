@@ -1,10 +1,11 @@
-import DS from 'ember-data';
+import Model, { attr } from 'ember-data/model';
+import Store from 'ember-data/store';
 import { assertType } from './lib/assert';
 
-declare const store: DS.Store;
+declare const store: Store;
 
-class User extends DS.Model {
-    username = DS.attr('string');
+class User extends Model {
+    username = attr('string');
 }
 
 declare module 'ember-data/types/registries/model' {

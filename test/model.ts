@@ -1,7 +1,7 @@
 import Ember from 'ember';
 import { assertType } from './lib/assert';
 import { Point } from './transform';
-import Model, { attr, ChangedAttributes } from 'ember-data/model';
+import Model, { attr, ChangedAttributes, Errors } from 'ember-data/model';
 import Store from 'ember-data/store';
 
 enum MyEnum {

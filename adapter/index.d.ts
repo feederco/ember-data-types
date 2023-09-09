@@ -1,6 +1,7 @@
 import ModelRegistry from "../types/registries/model";
-import { ModelSchema } from "../model";
+import { ModelSchema, Snapshot, SnapshotRecordArray } from "../model";
 import Store from "../store";
+import Ember from "ember";
 
 export { default as AdapterRegistry } from 'ember-data/types/registries/adapter';
 
