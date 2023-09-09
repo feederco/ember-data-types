@@ -6,7 +6,7 @@ import { JSONAPIError } from "./json-api";
  * subclasses are used to indicate specific error states. The following
  * subclasses are provided:
  */
-export class AdapterError extends Error {
+export default class AdapterError extends Error {
   isAdapterError: boolean;
 
   static code: string;
