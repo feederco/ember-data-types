@@ -13,15 +13,10 @@
 
 import Store from "./store";
 import Model, {
-  attr as modelAttr,
-  hasMany as modelHasMany,
-  belongsTo as modelBelongsTo,
   Errors,
-  ManyArray as modelManyArray,
-  PromiseManyArray as modelPromiseManyArray,
-  Snapshot,
   ManyArray,
   PromiseManyArray,
+  Snapshot,
   attr,
   belongsTo,
   hasMany
@@ -49,12 +44,15 @@ import BooleanTransform from "./transform/boolean";
 import DateTransform from "./transform/date";
 import NumberTransform from "./transform/number";
 import StringTransform from "./transform/string";
+import ModelRegistry from "ember-data/types/registries/model";
 
 export namespace DS {
   const VERSION: string;
 
   export {
     Store,
+
+    ModelRegistry,
 
     PromiseArray,
     PromiseObject,
