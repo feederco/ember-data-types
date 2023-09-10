@@ -9,12 +9,20 @@ How to use:
 ```json
 {
   "devDependencies": {
-    "ember-data-types": "github:feederco/ember-data-types#master"
+    "@types/ember-data": "github:feederco/ember-data-types#master"
   }
 }
 ```
 3. Run `npm install`
-4. Include the types where you define types. (Normally `types/*.d.ts`).
+4. Add to your tsconfig.json
 ```ts
-import 'ember-data-types';
+"paths": {
+  // ... your paths
+  "ember-data": [
+    "node_modules/@types/ember-data/index"
+  ],
+  "@ember-data/*": [
+    "node_modules/@types/ember-data/*"
+  ]
+}
 ``
