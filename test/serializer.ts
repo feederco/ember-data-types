@@ -1,14 +1,18 @@
-import Ember from 'ember';
-import DS, { ModelSchema } from 'ember-data';
+import Model, { ModelSchema, attr, belongsTo } from "ember-data/model";
+import { Snapshot } from "ember-data/legacy-compat";
+import JSONSerializer from "ember-data/serializer/json";
+import JSONAPISerializer from "ember-data/serializer/json-api";
+import RESTSerializer from "ember-data/serializer/rest";
+import Store from "ember-data/store";
 
 interface Dict<T> {
     [key: string]: T | null | undefined;
 }
 
-const JsonApi = DS.JSONAPISerializer.extend({});
+class JsonApi extends JSONAPISerializer {}
 
-const Customized = DS.JSONAPISerializer.extend({
-    serialize(snapshot: DS.Snapshot<'user'>, options: {}) {
+class Customized extends JSONAPISerializer {
+    serialize(snapshot: Snapshot<'user'>, options: {}) {
         const lookup = snapshot.belongsTo('username');
         let json: any = this._super(...Array.from(arguments));
 
@@ -18,9 +22,9 @@ const Customized = DS.JSONAPISerializer.extend({
         };
 
         return json;
-    },
+    }
     normalizeResponse(
-        store: DS.Store,
+        store: Store,
         primaryModelClass: ModelSchema<'user'>,
         payload: any,
         id: string | number,
@@ -32,11 +36,11 @@ const Customized = DS.JSONAPISerializer.extend({
         delete payload.data.attributes.cost;
 
         return this._super(...Array.from(arguments));
-    },
-});
+    }
+}
 
-const EmbeddedRecordMixin = DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
-    attrs: {
+class EmbeddedRecordMixin extends JSONSerializer {
+    attrs = {
         author: {
             serialize: false,
             deserialize: 'records',
@@ -45,16 +49,19 @@ const EmbeddedRecordMixin = DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
             deserialize: 'records',
             serialize: 'ids',
         },
-    },
-});
+    }
+}
 
-class Message extends DS.Model.extend({
-    title: DS.attr(),
-    body: DS.attr(),
+class User extends Model {}
+class Comment extends Model {}
 
-    author: DS.belongsTo('user'),
-    comments: DS.belongsTo('comment'),
-}) {}
+class Message extends Model {
+    @attr() title: any;
+    @attr() body: any;
+
+    @belongsTo('user') author!: User;
+    @belongsTo('comment') comments!: Comment[];
+}
 
 declare module 'ember-data/types/registries/model' {
     export default interface ModelRegistry {
@@ -66,8 +73,8 @@ interface CustomSerializerOptions {
     includeId: boolean;
 }
 
-const SerializerUsingSnapshots = DS.RESTSerializer.extend({
-    serialize(snapshot: DS.Snapshot<'message-for-serializer'>, options: CustomSerializerOptions) {
+class SerializerUsingSnapshots extends RESTSerializer {
+    serialize(snapshot: Snapshot<'message-for-serializer'>, options: CustomSerializerOptions) {
         let json: any = {
             POST_TTL: snapshot.attr('title'),
             POST_BDY: snapshot.attr('body'),
@@ -79,11 +86,10 @@ const SerializerUsingSnapshots = DS.RESTSerializer.extend({
         }
 
         return json;
-    },
-});
+    }
+}
 
-DS.Serializer.extend({
-    serialize(snapshot: DS.Snapshot<'message-for-serializer'>, options: {}) {
+class { extends(snapshot: Snapshot<'message-for-serializer'>, options: {}) {
         let json: Dict<any> = {
             id: snapshot.id,
         };
@@ -103,5 +109,5 @@ DS.Serializer.extend({
         });
 
         return json;
-    },
-});
+    }
+}

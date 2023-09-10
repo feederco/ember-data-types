@@ -1,23 +1,17 @@
 {
+    "extends": "@tsconfig/ember/tsconfig.json",
     "compilerOptions": {
-        "module": "commonjs",
-        "lib": [
-            "es6",
-            "dom"
-        ],
-        "target": "es6",
         "noImplicitAny": true,
         "noImplicitThis": true,
         "strictNullChecks": true,
         "strictFunctionTypes": true,
-        "baseUrl": "../",
+        "baseUrl": "./",
         "typeRoots": [
-            "../"
+            "./"
         ],
         "paths": {
-            "@ember/*": [
-                "ember__*"
-            ]
+            "ember-data/*": ["./*"],
+            "@ember-data/*": ["./*"],
         },
         "types": [],
         "noEmit": true,
@@ -25,21 +19,24 @@
         "esModuleInterop": true,
         "experimentalDecorators": true
     },
+    "include": [
+        "types/**/*"
+    ],
     "files": [
         "index.d.ts",
+        "test/adapter.ts",
+        "test/belongs-to.ts",
+        "test/error.ts",
+        "test/has-many.ts",
+        "test/injections.ts",
         "test/lib/assert.ts",
         "test/model.ts",
         "test/module-api.ts",
-        "test/adapter.ts",
-        "test/serializer.ts",
-        "test/transform.ts",
-        "test/relationships.ts",
-        "test/store.ts",
-        "test/has-many.ts",
-        "test/belongs-to.ts",
         "test/record-reference.ts",
-        "test/injections.ts",
-        "test/error.ts",
-        "test/promises.ts"
+        "test/relationships.ts",
+        "test/request.ts",
+        "test/serializer.ts",
+        "test/store.ts",
+        "test/transform.ts"
     ]
 }

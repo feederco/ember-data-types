@@ -1,39 +1,24 @@
 /**
- * Tests for the Ember-Data "module API" introduced in v2.3
- * @see https://www.emberjs.com/blog/2016/01/12/ember-data-2-3-released.html#toc_importing-modules
+ * Tests for the legacy DS namespace
  */
-import DS from 'ember-data';
-// Adapters
-import Adapter from 'ember-data/adapter';
-import JSONAPIAdapter from 'ember-data/adapters/json-api';
-import RESTAdapter from 'ember-data/adapters/rest';
-// Serializers
-import Serializer from 'ember-data/serializer';
-import RESTSerializer from 'ember-data/serializers/rest';
-import JSONSerializer from 'ember-data/serializers/json';
-import JSONAPISerializer from 'ember-data/serializers/json-api';
-
-// Model
-import Model from 'ember-data/model';
-// Model - attr
-import attr from 'ember-data/attr';
-// Model - relationships
-import { hasMany, belongsTo } from 'ember-data/relationships';
-
-// Transforms
-import BooleanTransform from 'ember-data/transforms/boolean';
-import StringTransform from 'ember-data/transforms/string';
-import NumberTransform from 'ember-data/transforms/number';
-import DateTransform from 'ember-data/transforms/date';
-import Transform from 'ember-data/transforms/transform';
-
-// Store
-import Store from 'ember-data/store';
-
-// Errors
-import * as EDErrors from 'ember-data/adapters/errors';
+import DS from '../index';
 
 import { assertType } from './lib/assert';
+import Adapter from '@ember-data/adapter';
+import JSONAPIAdapter from '@ember-data/adapter/json-api';
+import RESTAdapter from '@ember-data/adapter/rest';
+import Model, { attr, hasMany, belongsTo } from '@ember-data/model';
+import Serializer from '@ember-data/serializer';
+import JSONSerializer from '@ember-data/serializer/json';
+import RESTSerializer from '@ember-data/serializer/rest';
+import JSONAPISerializer from '@ember-data/serializer/json-api';
+import Store from '@ember-data/store';
+import AdapterError, { InvalidError, UnauthorizedError, ForbiddenError, NotFoundError, ConflictError, ServerError, TimeoutError, AbortError } from '@ember-data/adapter/error';
+import Transform from '@ember-data/transform';
+import BooleanTransform from '@ember-data/transform/boolean';
+import DateTransform from '@ember-data/transform/date';
+import NumberTransform from '@ember-data/transform/number';
+import StringTransform from '@ember-data/transform/string';
 
 // ADAPTERS
 // - identity
@@ -78,14 +63,12 @@ assertType<typeof DS.Store>(Store);
 
 // ERRORS
 // - identity
-assertType<typeof DS.AdapterError>(EDErrors.AdapterError);
-assertType<typeof DS.InvalidError>(EDErrors.InvalidError);
-assertType<typeof DS.UnauthorizedError>(EDErrors.UnauthorizedError);
-assertType<typeof DS.ForbiddenError>(EDErrors.ForbiddenError);
-assertType<typeof DS.NotFoundError>(EDErrors.NotFoundError);
-assertType<typeof DS.ConflictError>(EDErrors.ConflictError);
-assertType<typeof DS.ServerError>(EDErrors.ServerError);
-assertType<typeof DS.TimeoutError>(EDErrors.TimeoutError);
-assertType<typeof DS.AbortError>(EDErrors.AbortError);
-assertType<typeof DS.errorsHashToArray>(EDErrors.errorsHashToArray);
-assertType<typeof DS.errorsArrayToHash>(EDErrors.errorsArrayToHash);
+assertType<typeof DS.AdapterError>(AdapterError);
+assertType<typeof DS.InvalidError>(InvalidError);
+assertType<typeof DS.UnauthorizedError>(UnauthorizedError);
+assertType<typeof DS.ForbiddenError>(ForbiddenError);
+assertType<typeof DS.NotFoundError>(NotFoundError);
+assertType<typeof DS.ConflictError>(ConflictError);
+assertType<typeof DS.ServerError>(ServerError);
+assertType<typeof DS.TimeoutError>(TimeoutError);
+assertType<typeof DS.AbortError>(AbortError);

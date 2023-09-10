@@ -1,15 +1,19 @@
 import { service } from '@ember/service';
 import Ember from 'ember';
-import DS from 'ember-data';
 import { assertType } from './lib/assert';
 import { Comment } from './relationships';
+import Store from 'ember-data/store';
+import Model, { attr, hasMany } from '@ember-data/model';
+import Adapter from 'ember-data/adapter';
+import Serializer from 'ember-data/serializer';
+import { Collection } from 'ember-data/store/record-arrays';
 
-declare const store: DS.Store;
+declare const store: Store;
 
-class PostComment extends DS.Model {}
-class Post extends DS.Model {
-    title = DS.attr('string');
-    comments = DS.hasMany('comment');
+class PostComment extends Model {}
+class Post extends Model {
+    title = attr('string');
+    comments = hasMany('comment');
 }
 
 declare module 'ember-data/types/registries/model' {
@@ -36,8 +40,8 @@ store.findRecord('post', 1).then(function (post) {
     post.save(); // => PATCH to '/posts/1'
 });
 
-class User extends DS.Model {
-    username = DS.attr('string');
+class User extends Model {
+    username = attr('string');
 }
 
 class Author extends User {}
@@ -50,13 +54,15 @@ declare module 'ember-data/types/registries/model' {
 }
 
 store.queryRecord('user', {}).then(function (user) {
-    let username = user.get('username');
+    let username = user?.get('username');
     console.log(`Currently logged in as ${username}`);
 });
 
 store.findAll('post'); // => GET /posts
 store.findAll('author', { reload: true }).then(function (authors) {
-    authors.getEach('id'); // ['first', 'second']
+    authors.forEach(author => {
+        console.log(author.get('username'));
+    });
 });
 store.findAll('post', {
     adapterOptions: { subscribe: false },
@@ -73,10 +79,10 @@ if (store.hasRecordForId('post', 1)) {
 }
 
 let posts = store.findAll('post'); // => GET /posts
-assertType<DS.PromiseArray<Post, Ember.ArrayProxy<Post>>>(posts);
+assertType<Promise<Collection<Post>>>(posts);
 
-class Message extends DS.Model {
-    hasBeenSeen = DS.attr('boolean');
+class Message extends Model {
+    hasBeenSeen = attr('boolean');
 }
 
 declare module 'ember-data/types/registries/model' {
@@ -92,11 +98,11 @@ messages.forEach(function (message) {
 messages.save();
 
 const people = store.peekAll('user');
-people.get('isUpdating'); // false
+people.isUpdating; // false
 people.update().then(function () {
-    people.get('isUpdating'); // false
+    people.isUpdating; // false
 });
-people.get('isUpdating'); // true
+people.isUpdating; // true
 
 const MyRoute = Ember.Route.extend({
     store: Ember.inject.service('store'),
@@ -108,43 +114,43 @@ const MyRoute = Ember.Route.extend({
     },
 });
 
-// Store is injectable via `inject` and resolves to `DS.Store`.
+// Store is injectable via `inject` and resolves to `Store`.
 const SomeComponent = Ember.Object.extend({
     store: Ember.inject.service('store'),
 
     lookUpUsers() {
-        assertType<DS.PromiseObject<User>>(this.get('store').findRecord('user', 123));
-        assertType<DS.PromiseArray<User>>(this.get('store').findAll('user'));
+        assertType<Promise<User>>(this.get('store').findRecord('user', 123));
+        assertType<Promise<Collection<User>>>(this.get('store').findAll('user'));
     },
 });
 
 const MyRouteAsync = Ember.Route.extend({
     store: service('store'),
 
-    async beforeModel(): Promise<Ember.Array<DS.Model>> {
+    async beforeModel(): Promise<Collection<Model>> {
         const store = Ember.get(this, 'store');
         return await store.findAll('post-comment');
     },
-    async model(): Promise<DS.Model> {
+    async model(): Promise<Model> {
         const store = this.get('store');
         return await store.findRecord('post-comment', 1);
     },
-    async afterModel(): Promise<Ember.Array<Comment>> {
+    async afterModel(): Promise<Collection<Comment>> {
         const post = await this.get('store').findRecord('post', 1);
         return await post.get('comments');
     },
 });
 
 class MyRouteAsyncES6 extends Ember.Route {
-    @service declare store: DS.Store;
+    @service declare store: Store;
 
-    async beforeModel(): Promise<Ember.Array<DS.Model>> {
+    async beforeModel(): Promise<Collection<Model>> {
         return await this.store.findAll('post-comment');
     }
-    async model(): Promise<DS.Model> {
+    async model(): Promise<Model> {
         return await this.store.findRecord('post-comment', 1);
     }
-    async afterModel(): Promise<Ember.Array<Comment>> {
+    async afterModel(): Promise<Collection<Comment>> {
         const post = await this.store.findRecord('post', 1);
         return await post.get('comments');
     }
@@ -158,26 +164,26 @@ const tom = store
         },
     })
     .then(function (users) {
-        return users.get('firstObject');
+        return users[0];
     });
 
 // GET /users?isAdmin=true
 const adminsQuery = store.query('user', { isAdmin: true });
-assertType<DS.PromiseArray<User, DS.AdapterPopulatedRecordArray<User>>>(adminsQuery);
+assertType<Promise<Collection<User>>>(adminsQuery);
 
 adminsQuery.then(function (admins) {
-    console.log(admins.get("length")); // 42
+    console.log(admins.length); // 42
 
     // somewhere later in the app code, when new admins have been created
     // in the meantime
     //
     // GET /users?isAdmin=true
     admins.update().then(function() {
-        admins.get('isUpdating'); // false
-        console.log(admins.get("length")); // 123
+        admins.isUpdating; // false
+        console.log(admins.length); // 123
     });
 
-    admins.get('isUpdating'); // true
+    admins.isUpdating; // true
 });
 
 store.push({
@@ -205,10 +211,10 @@ store.push({
     ],
 });
 
-class UserAdapter extends DS.Adapter {
+class UserAdapter extends Adapter {
     thisAdapterOnlyMethod(): void {}
 }
-class UserSerializer extends DS.Serializer {
+class UserSerializer extends Serializer {
     thisSerializerOnlyMethod(): void {}
 }
 

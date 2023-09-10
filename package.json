@@ -1,0 +1,23 @@
+{
+  "name": "ember-data-types",
+  "version": "1.0.0",
+  "description": "Project to get uptodate types in DefinitelyTyped for ember-data 5.x.",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "node --require source-map-support/register node_modules/@definitelytyped/dtslint/ ."
+  },
+  "devDependencies": {
+    "@definitelytyped/dtslint": "^0.0.177",
+    "@tsconfig/ember": "^3.0.0",
+    "@types/ember__service": "^4.0.3",
+    "ember-source": "^5.1.2",
+    "source-map-support": "^0.5.21",
+    "typescript": "^5.1.6"
+  },
+  "author": "",
+  "license": "ISC",
+  "types": "./index.d.ts"
+}

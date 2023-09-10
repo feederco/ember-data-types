@@ -1,13 +1,13 @@
 import { assert } from '@ember/debug';
 import Ember from 'ember';
-import DS from 'ember-data';
+import Transform from 'ember-data/transform';
 
 export class Point extends Ember.Object {
-    x: number;
-    y: number;
+    x!: number;
+    y!: number;
 }
 
-class PointTransform extends DS.Transform {
+class PointTransform extends Transform {
     serialize(value: Point): number[] {
         return [value.get('x'), value.get('y')];
     }
@@ -16,7 +16,7 @@ class PointTransform extends DS.Transform {
     }
 }
 
-class EnumTransform extends DS.Transform {
+class EnumTransform extends Transform {
     deserialize<T>(
         serialized: any,
         options: { allowedValues: Record<string, T> },
