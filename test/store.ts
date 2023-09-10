@@ -3,7 +3,7 @@ import Ember from 'ember';
 import { assertType } from './lib/assert';
 import { Comment } from './relationships';
 import Store from 'ember-data/store';
-import Model, { attr, hasMany, belongsTo } from '@ember-data/model';
+import Model, { attr, hasMany } from '@ember-data/model';
 import Adapter from 'ember-data/adapter';
 import Serializer from 'ember-data/serializer';
 import { Collection } from 'ember-data/store/record-arrays';
@@ -54,13 +54,15 @@ declare module 'ember-data/types/registries/model' {
 }
 
 store.queryRecord('user', {}).then(function (user) {
-    let username = user.get('username');
+    let username = user?.get('username');
     console.log(`Currently logged in as ${username}`);
 });
 
 store.findAll('post'); // => GET /posts
 store.findAll('author', { reload: true }).then(function (authors) {
-    authors.getEach('id'); // ['first', 'second']
+    authors.forEach(author => {
+        console.log(author.get('username'));
+    });
 });
 store.findAll('post', {
     adapterOptions: { subscribe: false },
@@ -77,7 +79,7 @@ if (store.hasRecordForId('post', 1)) {
 }
 
 let posts = store.findAll('post'); // => GET /posts
-assertType<PromiseArray<Post, Ember.ArrayProxy<Post>>>(posts);
+assertType<Promise<Collection<Post>>>(posts);
 
 class Message extends Model {
     hasBeenSeen = attr('boolean');
@@ -96,11 +98,11 @@ messages.forEach(function (message) {
 messages.save();
 
 const people = store.peekAll('user');
-people.get('isUpdating'); // false
+people.isUpdating; // false
 people.update().then(function () {
-    people.get('isUpdating'); // false
+    people.isUpdating; // false
 });
-people.get('isUpdating'); // true
+people.isUpdating; // true
 
 const MyRoute = Ember.Route.extend({
     store: Ember.inject.service('store'),
@@ -125,7 +127,7 @@ const SomeComponent = Ember.Object.extend({
 const MyRouteAsync = Ember.Route.extend({
     store: service('store'),
 
-    async beforeModel(): Promise<Ember.Array<Model>> {
+    async beforeModel(): Promise<Collection<Model>> {
         const store = Ember.get(this, 'store');
         return await store.findAll('post-comment');
     },
@@ -133,7 +135,7 @@ const MyRouteAsync = Ember.Route.extend({
         const store = this.get('store');
         return await store.findRecord('post-comment', 1);
     },
-    async afterModel(): Promise<Ember.Array<Comment>> {
+    async afterModel(): Promise<Collection<Comment>> {
         const post = await this.get('store').findRecord('post', 1);
         return await post.get('comments');
     },
@@ -142,13 +144,13 @@ const MyRouteAsync = Ember.Route.extend({
 class MyRouteAsyncES6 extends Ember.Route {
     @service declare store: Store;
 
-    async beforeModel(): Promise<Ember.Array<Model>> {
+    async beforeModel(): Promise<Collection<Model>> {
         return await this.store.findAll('post-comment');
     }
     async model(): Promise<Model> {
         return await this.store.findRecord('post-comment', 1);
     }
-    async afterModel(): Promise<Ember.Array<Comment>> {
+    async afterModel(): Promise<Collection<Comment>> {
         const post = await this.store.findRecord('post', 1);
         return await post.get('comments');
     }
@@ -162,26 +164,26 @@ const tom = store
         },
     })
     .then(function (users) {
-        return users.get('firstObject');
+        return users[0];
     });
 
 // GET /users?isAdmin=true
 const adminsQuery = store.query('user', { isAdmin: true });
-assertType<PromiseArray<User, AdapterPopulatedRecordArray<User>>>(adminsQuery);
+assertType<Promise<Collection<User>>>(adminsQuery);
 
 adminsQuery.then(function (admins) {
-    console.log(admins.get("length")); // 42
+    console.log(admins.length); // 42
 
     // somewhere later in the app code, when new admins have been created
     // in the meantime
     //
     // GET /users?isAdmin=true
     admins.update().then(function() {
-        admins.get('isUpdating'); // false
-        console.log(admins.get("length")); // 123
+        admins.isUpdating; // false
+        console.log(admins.length); // 123
     });
 
-    admins.get('isUpdating'); // true
+    admins.isUpdating; // true
 });
 
 store.push({

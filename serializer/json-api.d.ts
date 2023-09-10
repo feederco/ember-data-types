@@ -1,12 +1,79 @@
-import Store from "../store";
 import JSONSerializer from "./json";
 import ModelRegistry from "../types/registries/model";
+import Store from "ember-data/store";
 
 // json-api types
 // from: https://github.com/emberjs/data/blob/v5.2.0/ember-data-types/q/ember-data-json-api.ts
 
+export type Meta = Record<string, JSONValue>;
+export type LinkObject = { href: string; meta?: Record<string, JSONValue> };
+export type Link = string | LinkObject;
+export interface Links {
+  related?: Link;
+  self?: Link;
+}
+export interface PaginationLinks extends Links {
+  first?: Link | null;
+  last?: Link | null;
+  prev?: Link | null;
+  next?: Link | null;
+}
+
 // Ember imports this from: https://www.npmjs.com/package/json-typescript
 type JSONValue = any;
+
+export interface NewResourceIdentifierObject {
+  id: string | null;
+  type: string;
+  lid: string;
+}
+
+export interface SingleResourceRelationship {
+  data?: ExistingResourceIdentifierObject | NewResourceIdentifierObject | null;
+  meta?: Record<string, JSONValue>;
+  links?: Links;
+}
+
+export interface CollectionResourceRelationship {
+  data?: Array<ExistingResourceIdentifierObject | NewResourceIdentifierObject>;
+  meta?: Record<string, JSONValue>;
+  links?: PaginationLinks;
+}
+
+
+export interface ExistingResourceIdentifierObject {
+  id: string;
+  type: string;
+  lid?: string;
+  meta?: Meta;
+}
+
+export interface ExistingResourceObject extends ExistingResourceIdentifierObject {
+  meta?: Record<string, JSONValue>;
+  attributes?: Record<string, JSONValue>;
+  relationships?: Record<string, SingleResourceRelationship | CollectionResourceRelationship>;
+  links?: Links;
+}
+
+interface Document {
+  meta?: Record<string, JSONValue>;
+  included?: ExistingResourceObject[];
+  jsonapi?: Record<string, JSONValue>;
+  links?: Links | PaginationLinks;
+  errors?: JSONValue[];
+}
+
+export interface EmptyResourceDocument extends Document {
+  data: null;
+}
+
+export interface SingleResourceDocument extends Document {
+  data: ExistingResourceObject;
+}
+
+export interface CollectionResourceDocument extends Document {
+  data: ExistingResourceObject[];
+}
 
 export type JSONAPIMeta = Record<string, JSONValue>;
 export type JSONAPILinkObject = { href: string; meta?: Record<string, JSONValue> };
@@ -22,6 +89,8 @@ export interface JSONAPIPaginationLinks extends JSONAPILinks {
   prev?: JSONAPILink | null;
   next?: JSONAPILink | null;
 }
+
+export type JsonApiDocument = EmptyResourceDocument | SingleResourceDocument | CollectionResourceDocument;
 
 /**
  * Ember Data 2.0 Serializer:

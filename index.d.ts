@@ -12,7 +12,20 @@
 // Minimum TypeScript Version: 4.4
 
 import Store from "./store";
-import Model, { attr as modelAttr, hasMany as modelHasMany, belongsTo as modelBelongsTo, Errors, ManyArray, Snapshot } from "./model";
+import Model, {
+  attr as modelAttr,
+  hasMany as modelHasMany,
+  belongsTo as modelBelongsTo,
+  Errors,
+  ManyArray as modelManyArray,
+  PromiseManyArray as modelPromiseManyArray,
+  Snapshot,
+  ManyArray,
+  PromiseManyArray,
+  attr,
+  belongsTo,
+  hasMany
+} from "./model";
 import Adapter, { BuildURLMixin } from "./adapter";
 import AdapterError, {
   InvalidError,
@@ -23,7 +36,7 @@ import AdapterError, {
   NotFoundError,
   ConflictError,
   ServerError,
-} from "./adapter/errors";
+} from "./adapter/error";
 import Serializer from "./serializer";
 import EmbeddedRecordsMixin from "./serializer/embedded-records-mixin";
 import JSONAPIAdapter from "./adapter/json-api";
@@ -39,59 +52,57 @@ import StringTransform from "./transform/string";
 
 export namespace DS {
   const VERSION: string;
-}
 
-interface DS {
-  Store: Store;
-  PromiseArray: PromiseArray;
-  PromiseObject: PromiseObject;
+  export {
+    Store,
 
-  PromiseManyArray: PromiseManyArray;
+    PromiseArray,
+    PromiseObject,
 
-  Model: Model;
-  attr: typeof modelAttr;
-  Errors: Errors;
+    PromiseManyArray,
+    ManyArray,
 
-  Snapshot: Snapshot;
+    Model,
+    attr,
+    Errors,
 
-  Adapter: Adapter;
+    Snapshot,
 
-  AdapterError: AdapterError;
-  InvalidError: InvalidError;
-  TimeoutError: TimeoutError;
-  AbortError: AbortError;
+    Adapter,
 
-  UnauthorizedError: UnauthorizedError;
-  ForbiddenError: ForbiddenError;
-  NotFoundError: NotFoundError;
-  ConflictError: ConflictError;
-  ServerError: ServerError;
+    AdapterError,
+    InvalidError,
+    TimeoutError,
+    AbortError,
 
-  Serializer: Serializer;
+    UnauthorizedError,
+    ForbiddenError,
+    NotFoundError,
+    ConflictError,
+    ServerError,
 
-  ManyArray: ManyArray;
+    Serializer,
 
-  RecordArrayManager: RecordArrayManager;
+    RESTAdapter,
+    BuildURLMixin,
 
-  RESTAdapter: RESTAdapter;
-  BuildURLMixin: BuildURLMixin;
+    RESTSerializer,
+    JSONSerializer,
 
-  RESTSerializer: RESTSerializer;
-  JSONSerializer: JSONSerializer;
+    JSONAPIAdapter,
+    JSONAPISerializer,
 
-  JSONAPIAdapter: JSONAPIAdapter;
-  JSONAPISerializer: JSONAPISerializer;
+    Transform,
+    DateTransform,
+    StringTransform,
+    NumberTransform,
+    BooleanTransform,
 
-  Transform: Transform;
-  DateTransform: DateTransform;
-  StringTransform: StringTransform;
-  NumberTransform: NumberTransform;
-  BooleanTransform: BooleanTransform;
+    EmbeddedRecordsMixin,
 
-  EmbeddedRecordsMixin: EmbeddedRecordsMixin;
-
-  belongsTo: typeof modelBelongsTo;
-  hasMany: typeof modelHasMany;
+    belongsTo,
+    hasMany,
+  }
 }
 
 export default DS;

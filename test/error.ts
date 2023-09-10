@@ -2,7 +2,7 @@ import EmberError from '@ember/error';
 import { service } from '@ember/service';
 import Ember from 'ember';
 import { assertType } from './lib/assert';
-import { AbortError, AdapterError, ConflictError, ForbiddenError, InvalidError, NotFoundError, ServerError, TimeoutError, UnauthorizedError } from 'ember-data/adapter/errors';
+import AdapterError, { AbortError, ConflictError, ForbiddenError, InvalidError, NotFoundError, ServerError, TimeoutError, UnauthorizedError } from 'ember-data/adapter/errors';
 
 // assert AdapterError extends EmberError
 assertType<EmberError>(new AdapterError('Error'));
@@ -51,7 +51,8 @@ assertType<typeof AdapterError>(AbortError);
 // https://emberjs.com/api/ember-data/2.16/classes/UnauthorizedError
 assertType<typeof AdapterError>(UnauthorizedError);
 
-declare class Route;
+declare class Route {};
+
 class Unauthorized extends Route {
     error(error: any, transition: any) {
         if (error instanceof UnauthorizedError) {

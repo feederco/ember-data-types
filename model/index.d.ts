@@ -1,10 +1,10 @@
-import { AdapterError } from '../adapter/errors';
-import Store from '../store';
+import AdapterError from '../adapter/error';
+import Store, { FindOptions } from '../store';
 import ModelRegistry from '../types/registries/model';
 import Transform from '../transform';
 import TransformRegistry from '../types/registries/transform';
-import Ember from "ember";
-import Evented from "@ember/object/evented";
+import Ember from 'ember';
+import Evented from '@ember/object/evented';
 import { Collection } from "../store/record-arrays";
 
 // Snapshot
@@ -204,6 +204,28 @@ declare function attr(options?: AttrOptions<any>): Ember.ComputedProperty<any>;
 declare function attr(target: any, propertyKey: string): void;
 
 // Relationships
+declare class PromiseManyArray<T> {
+  promise: Promise<ManyArray<T>> | null;
+  isDestroyed: boolean;
+  content: T | null;
+  get length(): number;
+  forEach(cb: (item: T, index: number) => void): void;
+  reload(options: FindOptions): Promise<ManyArray<T>>;
+  isPending: boolean;
+  isRejected: boolean;
+  isFulfilled: boolean;
+  isSettled: boolean;
+  then(
+    onFulfill: (value: ManyArray<T>) => void,
+    onReject?: (reason: any) => void
+  ): Promise<ManyArray<T>>;
+  catch(onReject: (reason: any) => void): Promise<ManyArray<T>>;
+  finally(callback: () => void): Promise<ManyArray<T>>;
+  destroy(): void;
+  links: any | null;
+  meta: any | null;
+}
+
 
 export interface RelationshipMetaOptions {
   async?: boolean | undefined;
@@ -258,7 +280,7 @@ declare function belongsTo<K extends keyof ModelRegistry>(
   ModelRegistry[K] | Promise<ModelRegistry[K] | null> | null
 >;
 
-type AsyncHasMany<T extends Model> = Promise<Collection<T>>;
+type AsyncHasMany<T extends Model> = Promise<PromiseManyArray<T>>;
 type SyncHasMany<T extends Model> = ManyArray<T>;
 
 /**
@@ -428,32 +450,7 @@ declare class RecordReference<T extends Model> {
  * relationship.
  */
 // tslint:disable-next-line:no-empty-interface -- used for declaration merge
-declare interface ManyArray<T> extends Ember.MutableArray<T>, Evented {}
-declare class ManyArray<T> extends Ember.Object {
-  /**
-   * The loading state of this array
-   */
-  isLoaded: boolean;
-  /**
-   * Metadata associated with the request for async hasMany relationships.
-   */
-  meta: {};
-  /**
-   * Reloads all of the records in the manyArray. If the manyArray
-   * holds a relationship that was originally fetched using a links url
-   * Ember Data will revisit the original links url to repopulate the
-   * relationship.
-   */
-  reload(): Promise<Collection<T>>;
-  /**
-   * Saves all of the records in the `ManyArray`.
-   */
-  save(): Promise<Collection<T>>;
-  /**
-   * Create a child record within the owner
-   */
-  createRecord(inputProperties?: {}): T;
-}
+declare interface ManyArray<T> extends Collection<T> {}
 
 // Model
 
@@ -771,7 +768,7 @@ declare class Model extends Ember.Object {
   The keys from the actual Model class, removing all the keys which come from
   the base class.
 */
-export type ModelKeys<ModelT extends Model> = Exclude<keyof ModelT, keyof ModelT>;
+export type ModelKeys<ModelT extends Model> = Exclude<keyof ModelT, keyof Model>;
 
 export type AttributesFor<ModelT extends Model> = ModelKeys<ModelT>; // TODO: filter to attr properties only (TS 2.8)
 export type RelationshipsFor<ModelT extends Model> = ModelKeys<ModelT>; // TODO: filter to hasMany/belongsTo properties only (TS 2.8)
@@ -840,6 +837,7 @@ export {
   HasManyReference,
   RecordReference,
   ManyArray,
+  PromiseManyArray,
 
   AttrOptions,
 

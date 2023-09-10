@@ -5,6 +5,7 @@ import RESTAdapter from './rest';
  * source code these types are used a lot, so we export them for convenience
  */
 
+
 export type JSONAPIErrorSource = {
   pointer: string;
 }

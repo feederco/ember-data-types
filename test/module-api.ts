@@ -1,7 +1,7 @@
 /**
  * Tests for the legacy DS namespace
  */
-import DS from 'ember-data';
+import DS from '../index';
 
 import { assertType } from './lib/assert';
 import Adapter from '@ember-data/adapter';
@@ -13,12 +13,12 @@ import JSONSerializer from '@ember-data/serializer/json';
 import RESTSerializer from '@ember-data/serializer/rest';
 import JSONAPISerializer from '@ember-data/serializer/json-api';
 import Store from '@ember-data/store';
-import { AdapterError, InvalidError, UnauthorizedError, ForbiddenError, NotFoundError, ConflictError, ServerError, TimeoutError, AbortError } from 'ember-data/adapter/errors';
-import Transform from 'ember-data/transform';
-import BooleanTransform from 'ember-data/transform/boolean';
-import DateTransform from 'ember-data/transform/date';
-import NumberTransform from 'ember-data/transform/number';
-import StringTransform from 'ember-data/transform/string';
+import AdapterError, { InvalidError, UnauthorizedError, ForbiddenError, NotFoundError, ConflictError, ServerError, TimeoutError, AbortError } from '@ember-data/adapter/error';
+import Transform from '@ember-data/transform';
+import BooleanTransform from '@ember-data/transform/boolean';
+import DateTransform from '@ember-data/transform/date';
+import NumberTransform from '@ember-data/transform/number';
+import StringTransform from '@ember-data/transform/string';
 
 // ADAPTERS
 // - identity

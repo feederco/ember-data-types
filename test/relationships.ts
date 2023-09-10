@@ -1,25 +1,36 @@
 import TransformRegistry from 'ember-data/types/registries/transform';
 import { assertType } from './lib/assert';
-import Model, { hasMany, belongsTo, attr } from 'ember-data/model';
+import Model, { hasMany, belongsTo, attr, PromiseManyArray } from 'ember-data/model';
 import Store from 'ember-data/store';
+import { Collection } from 'ember-data/store/record-arrays';
 
 declare const store: Store;
 
-class Folder extends Model {}
+
+class Folder extends Model {
+    @attr('string')
+    name!: string;
+
+    @hasMany('folder-belongs-to-test', { inverse: 'parent', async: false })
+    children!: Collection<Folder>;
+
+    @belongsTo('folder-belongs-to-test', { inverse: 'children', async: true })
+    parent!: Folder | null;
+}
 
 class PaymentMethod extends Model {}
 
 declare module 'ember-data/types/registries/model' {
     export default interface ModelRegistry {
-        folder: Folder;
+        'folder-in-relationships': Folder;
         'payment-method': PaymentMethod;
     }
 }
 class Person extends Model {
-    @hasMany('folder', { inverse: 'parent' })
+    @hasMany('folder-in-relationships', { inverse: 'parent', async: false })
     children!: Folder;
 
-    @belongsTo('folder', { inverse: 'children' })
+    @belongsTo('folder-in-relationships', { inverse: 'children', async: false })
     parent!: Folder;
 }
 
@@ -53,8 +64,8 @@ class Polymorphic extends Model {
     @attr('string')
     status!: string;
 
-    @hasMany('payment-method', { polymorphic: true })
-    paymentMethods: PaymentMethod[];
+    @hasMany('payment-method', { async: false, inverse: null, polymorphic: true })
+    paymentMethods!: PaymentMethod[];
 }
 
 // $ExpectType void
@@ -102,8 +113,8 @@ class RelationalPost extends Model {
     @attr('string')
     tag!: string;
 
-    @hasMany('comment', { async: true })
-    comments!: string;
+    @hasMany('comment', { inverse: null, async: true })
+    comments!: PromiseManyArray<Comment>;
 
     @hasMany('post')
     relatedPosts!: string;
@@ -124,7 +135,7 @@ declare module 'ember-data/types/registries/model' {
 let blogPost = store.peekRecord('relational-post', 1);
 blogPost!.get('comments').then(comments => {
     // now we can work with the comments
-    let author: string = comments.get('firstObject')!.get('author');
+    let author: string = comments[0]!.get('author');
 });
 
 blogPost!.hasMany('relatedPosts');

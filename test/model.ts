@@ -1,7 +1,7 @@
-import Ember from 'ember';
+import { computed } from '@ember/object';
 import { assertType } from './lib/assert';
 import { Point } from './transform';
-import Model, { attr, ChangedAttributes, Errors } from 'ember-data/model';
+import Model, { attr, ChangedAttributes, Errors, ModelKeys } from 'ember-data/model';
 import Store from 'ember-data/store';
 
 enum MyEnum {
@@ -16,23 +16,37 @@ class Hello extends Model {
 const hello = Hello.create();
 assertType<MyEnum>(hello.get('myEnum'));
 
-const Person = Model.extend({
-    firstName: attr(),
-    lastName: attr(),
-    title: attr({ defaultValue: 'The default' }),
-    title2: attr({ defaultValue: () => 'The default' }),
 
-    fullName: Ember.computed('firstName', 'lastName', function () {
+
+class Person extends Model {
+    @attr()
+    firstName: any;
+
+    @attr()
+    lastName: any;
+
+    @attr({ defaultValue: 'The default' })
+    title: any;
+
+    @attr({ defaultValue: () => 'The default' })
+    title2: any;
+
+    @computed('firstName', 'lastName')
+    get fullName() {
         return `${this.get('firstName')} ${this.get('lastName')}`;
-    }),
+    }
 
-    point: attr('point', { defaultValue: () => Point.create({ x: 1, y: 2 })}),
-    oldPoint: attr('oldPoint', { defaultValue: () => Point.create({ x: 1, y: 2 })}),
+    @attr('point', { defaultValue: () => Point.create({ x: 1, y: 2 })})
+    point!: Point;
+
+    @attr('oldPoint', { defaultValue: () => Point.create({ x: 1, y: 2 })})
+    oldPoint!: Point;
 
     // Can't have a non-primitive as default
     // @ts-expect-error
-    anotherPoint: attr('point', { defaultValue: Point.create({ x: 1, y: 2 })})
-});
+    @attr('point', { defaultValue: Point.create({ x: 1, y: 2 })}) anotherPoint!: string;
+}
+
 
 const person = Person.create();
 assertType<Point>(person.get('point'));
@@ -41,17 +55,43 @@ assertType<Point>(person.get('oldPoint'));
 assertType<Errors>(person.get('errors'));
 assertType<Errors>(person.errors);
 
-const User = Model.extend({
-    username: attr('string'),
-    email: attr('string'),
-    verified: attr('boolean', { defaultValue: false }),
-    canBeNull: attr('boolean', { allowNull: true }),
-    createdAt: attr('date', {
+// Ensure that 'ModelKeys' extracts all present properties
+// In future we should also test AttributesFor, RelationshipsFor
+// but they are just aliases for ModelKeys and don't do what they claim
+type PersonProperties =
+    | 'firstName'
+    | 'lastName'
+    | 'fullName'
+    | 'title'
+    | 'title2'
+    | 'point'
+    | 'oldPoint'
+    | 'anotherPoint';
+
+type PersonKeysType = ModelKeys<Person>;
+assertType<PersonKeysType>('firstName');
+
+// @ts-expect-error
+assertType<PersonKeysType>('dateOfBirth');
+
+// @ts-expect-error
+assertType<PersonKeysType>('get');
+
+// @ts-expect-error
+assertType<PersonKeysType>('store');
+
+class User extends Model {
+    @attr('string') username!: string;
+    @attr('string') email!: string;
+    @attr('boolean', { defaultValue: false }) verified!: boolean;
+    @attr('boolean', { allowNull: true }) canBeNull!: boolean | null;
+    @attr('date', {
         defaultValue() {
             return new Date();
         },
-    }),
-});
+    })
+    createdAt!: Date;
+}
 
 const user = User.create({ username: 'dwickern' });
 assertType<string>(user.get('id'));

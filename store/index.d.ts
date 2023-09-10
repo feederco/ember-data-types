@@ -5,6 +5,15 @@ import Model from "../model";
 import { RecordReference } from "../model";
 import Service from "@ember/service";
 import { Collection } from "./record-arrays";
+import { EmptyResourceDocument, SingleResourceDocument, CollectionResourceDocument, JsonApiDocument } from "ember-data/serializer/json-api";
+
+export interface FindOptions {
+  reload?: boolean;
+  backgroundReload?: boolean;
+  include?: string;
+  adapterOptions?: Record<string, unknown>;
+  preload?: Record<string, unknown>;
+}
 
 /**
  * The store contains all of the data for records loaded from the server.
@@ -42,7 +51,7 @@ declare class Store extends Service {
   findRecord<K extends keyof ModelRegistry>(
     modelName: K,
     id: string | number,
-    options?: {}
+    options?: FindOptions
   ): Promise<ModelRegistry[K]>;
   /**
    * Get the reference for the specified record.
@@ -74,7 +83,7 @@ declare class Store extends Service {
   query<K extends keyof ModelRegistry>(
     modelName: K,
     query: object,
-    options?: { adapterOptions?: object | undefined }
+    options?: { [key: string]: unknown; adapterOptions?: Record<string, unknown> }
   ): Promise<Collection<ModelRegistry[K]>>;
   /**
    * This method makes a request for one record, where the `id` is not known
@@ -83,7 +92,7 @@ declare class Store extends Service {
    */
   queryRecord<K extends keyof ModelRegistry>(
     modelName: K,
-    query: object,
+    query: Record<string, unknown>,
     options?: { adapterOptions?: object | undefined }
   ): Promise<ModelRegistry[K] | null>;
   /**
@@ -94,12 +103,7 @@ declare class Store extends Service {
    */
   findAll<K extends keyof ModelRegistry>(
     modelName: K,
-    options?: {
-      reload?: boolean | undefined;
-      backgroundReload?: boolean | undefined;
-      include?: string | undefined;
-      adapterOptions?: any;
-    }
+    options?: FindOptions
   ): Promise<Collection<ModelRegistry[K]>>;
   /**
    * This method returns a filtered array that contains all of the
@@ -129,7 +133,10 @@ declare class Store extends Service {
   /**
    * Push some data for a given type into the store.
    */
-  push(data: {}): Model | any[];
+  push(data: EmptyResourceDocument): null;
+  push(data: SingleResourceDocument): Model;
+  push(data: CollectionResourceDocument): Model[];
+  push(data: JsonApiDocument): Model | Model[] | null;
   /**
    * Push some raw data into the store.
    */
