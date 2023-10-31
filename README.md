@@ -9,7 +9,7 @@ How to use:
 ```json
 {
   "devDependencies": {
-    "@types/ember-data": "github:feederco/ember-data-types#master"
+    "@types/ember-data": "github:feederco/ember-data-types#main"
   }
 }
 ```
